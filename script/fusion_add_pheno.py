@@ -7,7 +7,7 @@ merge数据标准化
 def merge_data_normalize(configFile,data,fs_class_dict):
     cf = configparser.ConfigParser()
     cf.read(configFile)
-    fs_label = ["snp","cna","mut","pheno"]
+    fs_label = ["SNV","CNA","CNGM","pheno"]
     # StandardScaler / LeaveOneOutEncoder / MinMaxScaler
     fs_standardization = ["","StandardScaler","logMinMaxScaler",""]
 
@@ -69,15 +69,15 @@ if __name__ == "__main__":
     data_dict={}
     data_dict["inside_data_y"] = pd.read_csv("../../data/5_year_death.dataset1.txt", sep="\t")
     data_dict["inside_data_x_cna"] = pd.read_csv("../../data/CNA.5_year_death.dataset1.txt", sep="\t", index_col=0)
-    data_dict["inside_data_x_snp"] = pd.read_csv("../../data/SNP.5_year_death.dataset1.txt", sep="\t", index_col=0)
-    data_dict["inside_data_x_mut"] = pd.read_csv("../../data/MUT.5_year_death.dataset1.txt", sep="\t", index_col=0)
+    data_dict["inside_data_x_snp"] = pd.read_csv("../../data/SNV.5_year_death.dataset1.txt", sep="\t", index_col=0)
+    data_dict["inside_data_x_mut"] = pd.read_csv("../../data/CNGM.5_year_death.dataset1.txt", sep="\t", index_col=0)
     data_dict["inside_data_x"] = pd.DataFrame(pd.concat([data_dict["inside_data_x_cna"],data_dict["inside_data_x_snp"],data_dict["inside_data_x_mut"]],axis=1))
     data_dict['inside_data_x'] = data_dict['inside_data_x'].rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '-', x))
 
     data_dict["outside_data_y"] = pd.read_csv("../../data/5_year_death.dataset2.txt", sep="\t")
     data_dict["outside_data_x_cna"] = pd.read_csv("../../data/CNA.5_year_death.dataset2.txt", sep="\t", index_col=0)
     data_dict["outside_data_x_snp"] = pd.read_csv("../../data/SNP.5_year_death.dataset2.txt", sep="\t", index_col=0)
-    data_dict["outside_data_x_mut"] = pd.read_csv("../../data/MUT.5_year_death.dataset2.txt", sep="\t", index_col=0)
+    data_dict["outside_data_x_mut"] = pd.read_csv("../../data/CNGM.5_year_death.dataset2.txt", sep="\t", index_col=0)
     data_dict["outside_data_x"] = pd.DataFrame(pd.concat([data_dict["outside_data_x_cna"],data_dict["outside_data_x_snp"],data_dict["outside_data_x_mut"]],axis=1))
     data_dict['outside_data_x'] = data_dict['outside_data_x'].rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '-', x))
 
@@ -96,17 +96,17 @@ if __name__ == "__main__":
     new_data_dict["outside_data_x"] =  pd.DataFrame(pd.concat([data_dict["outside_data_x"][x['train']['x'].columns],pheno_x],axis=1))
     new_data_dict["outside_data_y"] =  pd.read_csv("../../data/5_year_death.dataset2.txt", sep="\t")['Type']
 
-    fs_key_list = { 'cna':[], 'snp':[], 'mut':[], 'pheno':[]}
+    fs_key_list = { 'CNA':[], 'SNV':[], 'CNGM':[], 'pheno':[]}
     for i in  new_data_dict["outside_data_x"].columns:
         if re.match( r'^\d+$', i):
-            fs_key_list['cna'].append(i)
+            fs_key_list['CNA'].append(i)
         elif re.match( r'.*-.*', i):
-            fs_key_list['snp'].append(i)
+            fs_key_list['SNV'].append(i)
         elif i in ["AGE_AT_DIAGNOSIS","LYMPH_NODES_EXAMINED_POSITIVE","INFERRED_MENOPAUSAL_STATE"]:
             fs_key_list['pheno'].append(i)
             print("pheno",i)
         else:
-            fs_key_list['mut'].append(i)
+            fs_key_list['CNGM'].append(i)
 
     
 
