@@ -15,7 +15,7 @@ def merge_data_normalize(configFile,data,fs_class_dict):
     fs_data_test = []
     if cf.get("data","outside_data_y"):
         fs_data_test_out = []
-   
+    
     for j in range(0,len(fs_label)):
         # 获取特征切片数据
         data_tmp_dict = {'train':{},'test':{}}
@@ -67,49 +67,45 @@ def merge_data_normalize(configFile,data,fs_class_dict):
 
 if __name__ == "__main__":
     data_dict={}
-    data_dict["inside_data_y"] = pd.read_csv("../../data/5_year_death.dataset1.txt", sep="\t")
-    data_dict["inside_data_x_cna"] = pd.read_csv("../../data/CNA.5_year_death.dataset1.txt", sep="\t", index_col=0)
-    data_dict["inside_data_x_snp"] = pd.read_csv("../../data/SNV.5_year_death.dataset1.txt", sep="\t", index_col=0)
-    data_dict["inside_data_x_mut"] = pd.read_csv("../../data/CNGM.5_year_death.dataset1.txt", sep="\t", index_col=0)
+    data_dict["inside_data_y"] = pd.read_csv("../../data/TYPE_1.txt", sep="\t")['label']
+    data_dict["inside_data_x_cna"] = pd.read_csv("../../data/CNA_1.txt", sep="\t", index_col=0)
+    data_dict["inside_data_x_snp"] = pd.read_csv("../../data/SNP_1.txt", sep="\t", index_col=0).rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '-', x))
+    data_dict["inside_data_x_mut"] = pd.read_csv("../../data/MUT_1.txt", sep="\t", index_col=0)
     data_dict["inside_data_x"] = pd.DataFrame(pd.concat([data_dict["inside_data_x_cna"],data_dict["inside_data_x_snp"],data_dict["inside_data_x_mut"]],axis=1))
     data_dict['inside_data_x'] = data_dict['inside_data_x'].rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '-', x))
 
-    data_dict["outside_data_y"] = pd.read_csv("../../data/5_year_death.dataset2.txt", sep="\t")
-    data_dict["outside_data_x_cna"] = pd.read_csv("../../data/CNA.5_year_death.dataset2.txt", sep="\t", index_col=0)
-    data_dict["outside_data_x_snp"] = pd.read_csv("../../data/SNP.5_year_death.dataset2.txt", sep="\t", index_col=0)
-    data_dict["outside_data_x_mut"] = pd.read_csv("../../data/CNGM.5_year_death.dataset2.txt", sep="\t", index_col=0)
+    data_dict["outside_data_y"] = pd.read_csv("../../data/TYPE_2.txt", sep="\t")
+    data_dict["outside_data_x_cna"] = pd.read_csv("../../data/CNA_2.txt", sep="\t", index_col=0)
+    data_dict["outside_data_x_snp"] = pd.read_csv("../../data/SNP_2.txt", sep="\t", index_col=0).rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '-', x))
+    data_dict["outside_data_x_mut"] = pd.read_csv("../../data/MUT_2.txt", sep="\t", index_col=0)
     data_dict["outside_data_x"] = pd.DataFrame(pd.concat([data_dict["outside_data_x_cna"],data_dict["outside_data_x_snp"],data_dict["outside_data_x_mut"]],axis=1))
     data_dict['outside_data_x'] = data_dict['outside_data_x'].rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '-', x))
 
     x = load_variable("fusion_fs_featurebuild.data")
     new_data_dict = {}
-    y = data_dict["inside_data_y"]
-    pheno_x = y[["AGE_AT_DIAGNOSIS","LYMPH_NODES_EXAMINED_POSITIVE","INFERRED_MENOPAUSAL_STATE"]]
+    pheno_x = pd.read_csv("../../data/CLN_1.txt", sep="\t", index_col=0)
     pheno_x.index = data_dict["inside_data_x"].index
     new_data_dict["inside_data_x"] =  pd.DataFrame(pd.concat([data_dict["inside_data_x"][x['train']['x'].columns],pheno_x],axis=1))
-    new_data_dict["inside_data_y"] =  pd.read_csv("../../data/5_year_death.dataset1.txt", sep="\t")['Type']
+    new_data_dict["inside_data_y"] =  pd.read_csv("../../data/TYPE_1.txt", sep="\t")['label']
 
 
-    y = data_dict["outside_data_y"]
-    pheno_x = y[["AGE_AT_DIAGNOSIS","LYMPH_NODES_EXAMINED_POSITIVE","INFERRED_MENOPAUSAL_STATE"]]
+    pheno_x = pd.read_csv("../../data/CLN_2.txt", sep="\t", index_col=0)
     pheno_x.index = data_dict["outside_data_x"].index
     new_data_dict["outside_data_x"] =  pd.DataFrame(pd.concat([data_dict["outside_data_x"][x['train']['x'].columns],pheno_x],axis=1))
-    new_data_dict["outside_data_y"] =  pd.read_csv("../../data/5_year_death.dataset2.txt", sep="\t")['Type']
+    new_data_dict["outside_data_y"] =  pd.read_csv("../../data/TYPE_2.txt", sep="\t")['label']
 
     fs_key_list = { 'CNA':[], 'SNV':[], 'CNGM':[], 'pheno':[]}
     for i in  new_data_dict["outside_data_x"].columns:
-        if re.match( r'^\d+$', i):
+        if re.match( r'^C0\d+$', i):
             fs_key_list['CNA'].append(i)
         elif re.match( r'.*-.*', i):
             fs_key_list['SNV'].append(i)
-        elif i in ["AGE_AT_DIAGNOSIS","LYMPH_NODES_EXAMINED_POSITIVE","INFERRED_MENOPAUSAL_STATE"]:
+        elif i in pheno_x.columns:
             fs_key_list['pheno'].append(i)
             print("pheno",i)
         else:
             fs_key_list['CNGM'].append(i)
-
     
-
     configFile = sys.argv[1]
 
     #数据拆分 inside_data_split_data.data

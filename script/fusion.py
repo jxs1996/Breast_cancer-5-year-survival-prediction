@@ -9,12 +9,12 @@ def load_merge_y_data(configFile):
     data_dict = {}
     # 读取数据部分高度定制化，可以自己定制
     if cf.get("data","inside_data_y"):
-        inside_data_y = pd.read_csv(cf.get("data","inside_data_y"), sep="\t")['Type']
+        inside_data_y = pd.read_csv(cf.get("data","inside_data_y"), sep="\t")['label']
         data_dict["inside_data_y"] = inside_data_y
         logging_config(u"reading inside_data_y...","info")
 
     if cf.get("data","outside_data_y"):
-        outside_data_y  = pd.read_csv(cf.get("data","outside_data_y"), sep="\t")['Type']
+        outside_data_y  = pd.read_csv(cf.get("data","outside_data_y"), sep="\t")['label']
         data_dict["outside_data_y"] = outside_data_y
         logging_config(u"reading outside_data_y...","info")
 
