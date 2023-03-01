@@ -37,4 +37,4 @@ python {PATH_TO_SCRIPT_DIR}/best_feature.num.py best_fs_num_config.ini
 5. The order of execution, cna, mut, snp> fusion> fusion_add_pheno. If the file contains a *sh file, run the *.sh file first, and then run the python command.
 6. The configuration file can configure various parameters of the model. 
 
-![image](https://github.com/jxs1996/Breast_cancer-5-year-survival-prediction/blob/main/pipeline.png)
+![image](https://github.com/jxs1996/Breast_cancer-5-year-survival-prediction/blob/main/pipeline.png) 
